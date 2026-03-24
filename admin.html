@@ -1,65 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ananya Admin Pro</title>
+    <title>Ananya Boutique - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'sans-serif'; background: #f8fafc; }
+        body { font-family: sans-serif; background-color: #fef2f2; }
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        .active-tab { display: block; }
     </style>
 </head>
 <body class="p-4">
 
-    <div id="loginLock" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-6 text-center">
-        <h2 class="text-2xl font-bold text-pink-600 mb-6">ANANYA ADMIN</h2>
-        <input type="password" id="adminPin" inputmode="numeric" maxlength="4" placeholder="Enter PIN" class="w-full max-w-xs p-4 rounded-xl border border-pink-200 text-center text-2xl mb-4">
-        <button onclick="checkPin()" class="w-full max-w-xs bg-pink-600 text-white py-4 rounded-xl font-bold shadow-lg">Unlock</button>
+    <div id="loginSection" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center p-8">
+        <h1 class="text-3xl font-bold text-pink-600 mb-8">Admin Login</h1>
+        <input type="password" id="pinInput" placeholder="Enter 4-Digit PIN" maxlength="4" class="w-full max-w-xs p-4 border-2 border-pink-100 rounded-2xl text-center text-2xl mb-4 outline-none focus:border-pink-500">
+        <button onclick="login()" class="w-full max-w-xs bg-pink-600 text-white py-4 rounded-2xl font-bold text-xl shadow-lg">Unlock Dashboard</button>
     </div>
 
-    <div id="adminPanel" class="hidden max-w-lg mx-auto">
+    <div id="dashboard" class="hidden max-w-md mx-auto">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-xl font-bold">Dashboard</h1>
-            <button onclick="location.reload()" class="text-red-500 text-xs font-bold">LOGOUT</button>
+            <h2 class="text-xl font-bold text-gray-800 underline decoration-pink-300">Ananya Hub Admin</h2>
+            <button onclick="location.reload()" class="bg-gray-200 px-4 py-2 rounded-lg text-xs font-bold">LOGOUT</button>
         </div>
 
         <div class="flex gap-2 mb-6">
-            <button onclick="switchTab('ordersTab', this)" class="tab-btn bg-pink-600 text-white flex-1 py-3 rounded-lg text-xs font-bold">ORDERS</button>
-            <button onclick="switchTab('addTab', this)" class="tab-btn bg-white flex-1 py-3 rounded-lg text-xs font-bold shadow-sm">ADD PRODUCT</button>
-            <button onclick="switchTab('qrTab', this)" class="tab-btn bg-white flex-1 py-3 rounded-lg text-xs font-bold shadow-sm">QR SETTINGS</button>
+            <button onclick="showTab('orders')" id="btn-orders" class="tab-btn flex-1 py-3 bg-pink-600 text-white rounded-xl font-bold text-sm shadow-md">Orders</button>
+            <button onclick="showTab('products')" id="btn-products" class="tab-btn flex-1 py-3 bg-white text-gray-600 rounded-xl font-bold text-sm shadow-sm">Add Product</button>
+            <button onclick="showTab('qr')" id="btn-qr" class="tab-btn flex-1 py-3 bg-white text-gray-600 rounded-xl font-bold text-sm shadow-sm">QR Code</button>
         </div>
 
-        <div id="ordersTab" class="tab-content active space-y-4">
-            <div id="ordersList" class="space-y-4 text-center text-gray-400 italic py-10">Orders loading...</div>
+        <div id="tab-orders" class="tab-content active-tab space-y-4">
+            <h3 class="font-bold text-gray-600">Naye Orders:</h3>
+            <div id="ordersList" class="space-y-4 text-center py-10 text-gray-400">Loading orders...</div>
         </div>
 
-        <div id="addTab" class="tab-content bg-white p-6 rounded-2xl shadow-sm space-y-4">
-            <input type="text" id="pName" placeholder="Product Name" class="w-full p-3 bg-gray-50 rounded-lg outline-none">
-            <input type="number" id="pPrice" placeholder="Price (₹)" class="w-full p-3 bg-gray-50 rounded-lg outline-none">
-            <select id="pCategory" class="w-full p-3 bg-gray-50 rounded-lg outline-none">
+        <div id="tab-products" class="tab-content bg-white p-6 rounded-3xl shadow-xl space-y-4 border border-pink-50">
+            <h3 class="font-bold text-center text-pink-600 mb-2">Naya Product Jodein</h3>
+            <input type="text" id="pName" placeholder="Product Name (e.g. Red Saree)" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-100 outline-none">
+            <input type="number" id="pPrice" placeholder="Price (₹)" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-100 outline-none">
+            
+            <select id="pCategory" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-100 outline-none">
                 <option value="Sarees">Sarees</option>
                 <option value="Kurtis">Kurtis</option>
+                <option value="Jewelry">Jewelry</option>
             </select>
-            <input type="text" id="pImg" placeholder="Image URL (Link)" class="w-full p-3 bg-gray-50 rounded-lg outline-none">
-            <button onclick="uploadProduct()" id="pBtn" class="w-full bg-black text-white py-3 rounded-lg font-bold">Add Product</button>
+
+            <input type="text" id="pImage" placeholder="Image URL (Link Paste Karein)" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-100 outline-none">
+            
+            <button onclick="saveProduct()" id="saveBtn" class="w-full bg-black text-white py-4 rounded-xl font-bold text-lg shadow-lg">Save Product Now</button>
         </div>
 
-        <div id="qrTab" class="tab-content bg-white p-6 rounded-2xl shadow-sm space-y-4 text-center">
-            <h3 class="font-bold text-sm mb-2 uppercase">Payment QR Link</h3>
-            <input type="text" id="qrUrl" placeholder="Paste Image Link Here" class="w-full p-3 bg-gray-50 rounded-lg outline-none text-xs border border-pink-100">
-            <button onclick="updateQR()" id="qrBtn" class="w-full bg-pink-600 text-white py-3 rounded-lg font-bold">Update QR Code</button>
-            <div class="mt-4 p-2 bg-gray-100 rounded-lg">
-                <p class="text-[10px] text-gray-400 mb-2">Live QR Preview:</p>
-                <img id="qrPreviewImg" src="" class="w-32 mx-auto">
+        <div id="tab-qr" class="tab-content bg-white p-6 rounded-3xl shadow-xl space-y-4 text-center border border-pink-50">
+            <h3 class="font-bold text-pink-600 mb-2">Payment QR Link Update</h3>
+            <input type="text" id="qrInput" placeholder="QR Image Direct Link" class="w-full p-4 bg-gray-50 rounded-xl border border-gray-100 outline-none">
+            <button onclick="saveQR()" class="w-full bg-pink-600 text-white py-4 rounded-xl font-bold">Update QR Link</button>
+            <div class="mt-4">
+                <p class="text-[10px] text-gray-400 mb-2">Current QR Preview:</p>
+                <img id="qrPreview" src="" class="w-32 mx-auto border p-1 rounded-lg">
             </div>
         </div>
     </div>
 
     <script>
+        // *** APNI FIREBASE CONFIG YAHAN REPLACE KAREIN ***
         const firebaseConfig = {
             apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
             authDomain: "mb-collection-16a7c.firebaseapp.com",
@@ -68,63 +75,113 @@
             messagingSenderId: "2884770751",
             appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        function checkPin() {
-            if(document.getElementById('adminPin').value === "2026") {
-                document.getElementById('loginLock').style.display = 'none';
-                document.getElementById('adminPanel').classList.remove('hidden');
+        // 1. LOGIN FUNCTION
+        function login() {
+            const pin = document.getElementById('pinInput').value;
+            if(pin === "2026") {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
                 loadOrders();
-            } else { alert("Wrong PIN!"); }
+                loadCurrentQR();
+            } else {
+                alert("❌ Galat PIN! Dobara koshish karein.");
+            }
         }
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-pink-600', 'text-white'); b.classList.add('bg-white'); });
-            document.getElementById(tabId).classList.add('active');
-            btn.classList.add('bg-pink-600', 'text-white');
+        // 2. TAB SWITCHER
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active-tab'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-pink-600', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600');
+            });
+            document.getElementById('tab-' + tabName).classList.add('active-tab');
+            document.getElementById('btn-' + tabName).classList.add('bg-pink-600', 'text-white');
         }
 
-        async function uploadProduct() {
+        // 3. PRODUCT SAVE FUNCTION (Fix वाला)
+        async function saveProduct() {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
             const category = document.getElementById('pCategory').value;
-            const image = document.getElementById('pImg').value;
-            if(!name || !price || !image) return alert("Details bhariye!");
-            await db.collection("products").add({ name, price, category, image, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert("Done!"); location.reload();
+            const image = document.getElementById('pImage').value;
+            const btn = document.getElementById('saveBtn');
+
+            if(!name || !price || !image) {
+                alert("❌ Kripya sabhi details bhariye!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Saving to Database...";
+
+            try {
+                await db.collection("products").add({
+                    name: name,
+                    price: Number(price),
+                    category: category,
+                    image: image,
+                    dateAdded: new Date().toISOString()
+                });
+                alert("✅ Success! Product shop par dikhne lagega.");
+                location.reload(); 
+            } catch (error) {
+                console.error("Error:", error);
+                alert("❌ Error: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "Save Product Now";
+            }
         }
 
-        async function updateQR() {
-            const url = document.getElementById('qrUrl').value;
-            if(!url) return alert("Enter URL!");
-            await db.collection("settings").doc("payment").set({ qrCode: url });
-            alert("QR Updated!"); location.reload();
-        }
-
+        // 4. LOAD ORDERS
         function loadOrders() {
             db.collection("orders").orderBy("orderDate", "desc").onSnapshot(snap => {
                 const list = document.getElementById('ordersList');
                 list.innerHTML = "";
+                if(snap.empty) {
+                    list.innerHTML = "Abhi koi naya order nahi hai.";
+                    return;
+                }
                 snap.forEach(doc => {
                     const o = doc.data();
-                    list.innerHTML += `<div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-pink-500 text-left">
-                        <p class="font-bold text-gray-800">${o.customerName}</p>
-                        <p class="text-xs text-gray-500">${o.customerPhone}</p>
-                        <p class="text-xs text-gray-600 bg-gray-50 p-2 my-2 rounded">${o.deliveryAddress}</p>
-                        <p class="text-[11px] font-bold text-pink-600 border-t pt-2">Total: ₹${o.totalAmount}</p>
-                    </div>`;
+                    list.innerHTML += `
+                        <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-pink-500 text-left">
+                            <div class="flex justify-between items-start">
+                                <p class="font-bold text-gray-800 text-lg">${o.customerName}</p>
+                                <span class="bg-pink-50 text-pink-600 text-[10px] px-2 py-1 rounded-full font-bold">NEW</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-2">📞 ${o.customerPhone}</p>
+                            <p class="text-xs text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">🏠 ${o.deliveryAddress}</p>
+                            <div class="mt-3 pt-2 border-t flex justify-between">
+                                <span class="text-xs text-gray-400">Total Bill:</span>
+                                <span class="font-bold text-pink-600">₹${o.totalAmount}</span>
+                            </div>
+                        </div>`;
                 });
             });
         }
 
-        db.collection("settings").doc("payment").get().then(doc => {
-            if(doc.exists) {
-                document.getElementById('qrUrl').value = doc.data().qrCode;
-                document.getElementById('qrPreviewImg').src = doc.data().qrCode;
-            }
-        });
+        // 5. QR CODE FUNCTIONS
+        async function saveQR() {
+            const link = document.getElementById('qrInput').value;
+            if(!link) return alert("Link toh daliye!");
+            await db.collection("settings").doc("payment").set({ qrCode: link });
+            alert("QR Updated!");
+            loadCurrentQR();
+        }
+
+        function loadCurrentQR() {
+            db.collection("settings").doc("payment").get().then(doc => {
+                if(doc.exists) {
+                    document.getElementById('qrPreview').src = doc.data().qrCode;
+                    document.getElementById('qrInput').value = doc.data().qrCode;
+                }
+            });
+        }
     </script>
 </body>
 </html>
