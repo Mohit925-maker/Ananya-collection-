@@ -1,94 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
+<<!DOCTYPE html>
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ananya Checkout</title>
+    <title>Ananya - Checkout</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <style>
-        body { font-family: 'sans-serif'; background: #fff5f7; }
-    </style>
 </head>
-<body class="p-4 pb-10">
+<body class="bg-pink-50 p-4 pb-12">
 
     <div class="max-w-md mx-auto space-y-6">
-        
-        <h1 class="text-center text-2xl font-bold text-pink-600 py-4">Checkout</h1>
+        <div class="flex items-center gap-4">
+            <a href="cart.html" class="bg-white p-2 rounded-full shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-2xl font-bold text-pink-600">Checkout</h1>
+        </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-lg">
-            <h2 class="font-bold mb-4 border-b pb-2">Your Order</h2>
-            <div id="orderSummary" class="text-sm space-y-2 mb-4"></div>
-            <div class="flex justify-between font-bold text-pink-600 text-lg border-t pt-3">
+        <div class="bg-white p-6 rounded-3xl shadow-md border border-pink-100">
+            <h3 class="font-bold border-b pb-2 mb-3 text-gray-700">Order Summary</h3>
+            <div id="orderItems" class="space-y-2 text-sm text-gray-600"></div>
+            <div class="flex justify-between font-bold text-lg text-pink-600 border-t mt-3 pt-3">
                 <span>Total:</span> <span id="finalTotal">₹0</span>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-lg space-y-4">
-            <h2 class="font-bold mb-2 border-b pb-2">Delivery Details</h2>
-            <input type="text" id="custName" placeholder="Full Name" class="w-full p-4 bg-pink-50 rounded-xl outline-none">
-            <input type="tel" id="custPhone" placeholder="Phone Number" class="w-full p-4 bg-pink-50 rounded-xl outline-none">
-            <textarea id="custAddress" placeholder="Full Address with Pincode" class="w-full p-4 bg-pink-50 rounded-xl outline-none h-24"></textarea>
+        <div class="bg-white p-6 rounded-3xl shadow-md space-y-4">
+            <h3 class="font-bold border-b pb-2 text-gray-700">Delivery Address</h3>
+            <input type="text" id="custName" placeholder="Aapka Naam" class="w-full p-4 bg-pink-50/50 rounded-xl outline-none border border-transparent focus:border-pink-300">
+            <input type="tel" id="custPhone" placeholder="Mobile Number" class="w-full p-4 bg-pink-50/50 rounded-xl outline-none border border-transparent focus:border-pink-300">
+            <textarea id="custAddress" placeholder="Pura Address (Makaan No, Gali, Area, City, Pincode)" class="w-full p-4 bg-pink-50/50 rounded-xl outline-none h-24 border border-transparent focus:border-pink-300"></textarea>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-lg text-center">
-            <h2 class="font-bold mb-4">Payment</h2>
-            <div class="border-4 border-dashed border-pink-100 p-2 inline-block rounded-2xl mb-4">
-                <img id="qrDisplayImg" src="https://i.ibb.co/LXX1DVdd/phonepe-1774254528875.png" class="w-48 h-48 mx-auto object-contain">
+        <div class="bg-white p-6 rounded-3xl shadow-md text-center border-2 border-pink-200">
+            <h3 class="font-bold mb-4 text-gray-800">Scan & Pay (PhonePe)</h3>
+            <div class="p-2 inline-block bg-white rounded-2xl shadow-inner mb-4">
+                <img id="qrDisplay" src="https://i.ibb.co/LXX1DVdd/phonepe-1774254528875.png" 
+                     class="w-56 h-56 mx-auto object-contain rounded-lg shadow-sm"
+                     onerror="this.src='https://i.ibb.co/LXX1DVdd/phonepe-1774254528875.png'">
             </div>
-            <p class="text-[10px] text-pink-500 font-bold italic">Scan & Pay to Confirm Order</p>
+            <p class="text-xs text-gray-500 italic mb-2">QR Code scan karke payment karein</p>
+            <div class="bg-pink-50 py-2 px-4 rounded-full inline-block text-[10px] text-pink-600 font-bold uppercase tracking-wider">
+                100% Secure Checkout
+            </div>
         </div>
 
-        <button onclick="submitOrder()" id="orderBtn" class="w-full bg-pink-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-pink-200">Confirm Order</button>
-
+        <button onclick="submitOrder()" id="finalBtn" class="w-full bg-pink-600 text-white py-5 rounded-2xl font-bold text-xl shadow-xl shadow-pink-200 active:scale-95 transition-transform">
+            Confirm Order Now
+        </button>
     </div>
 
     <script>
+        // *** NAYA FIREBASE CONFIG ***
         const firebaseConfig = {
-            apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
-            authDomain: "mb-collection-16a7c.firebaseapp.com",
-            projectId: "mb-collection-16a7c",
-            storageBucket: "mb-collection-16a7c.firebasestorage.app",
-            messagingSenderId: "2884770751",
-            appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
+            apiKey: "AIzaSyBOhnP6mG5mmFEhruPBL9s-yq_uSV_U4H4",
+            authDomain: "mb-collection-1846c.firebaseapp.com",
+            projectId: "mb-collection-1846c",
+            storageBucket: "mb-collection-1846c.firebasestorage.app",
+            messagingSenderId: "139202861306",
+            appId: "1:139202861306:web:b2a1f3bf48d6a7dc7a1143"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // 1. Load Data from LocalStorage
         let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
         let total = 0;
+        const itemsDiv = document.getElementById('orderItems');
+        
+        if(cart.length === 0) {
+            window.location.href = "index.html";
+        }
+
         cart.forEach(item => {
             total += parseInt(item.price);
-            document.getElementById('orderSummary').innerHTML += `<div class="flex justify-between"><span>${item.name}</span><b>₹${item.price}</b></div>`;
+            itemsDiv.innerHTML += `<div class="flex justify-between uppercase"><span>${item.name}</span><b>₹${item.price}</b></div>`;
         });
         document.getElementById('finalTotal').innerText = "₹" + total;
 
-        // FETCH QR FROM FIREBASE (With Auto-Update)
+        // 2. Load QR from Firebase (Live Update)
         db.collection("settings").doc("payment").onSnapshot(doc => {
             if(doc.exists && doc.data().qrCode) {
-                document.getElementById('qrDisplayImg').src = doc.data().qrCode;
+                document.getElementById('qrDisplay').src = doc.data().qrCode;
             }
         });
 
+        // 3. Final Order Submission
         async function submitOrder() {
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const address = document.getElementById('custAddress').value;
-            if(!name || !phone || !address) return alert("Details bhariye!");
+            const btn = document.getElementById('finalBtn');
 
-            document.getElementById('orderBtn').innerText = "Saving Order...";
-            document.getElementById('orderBtn').disabled = true;
+            if(!name || !phone || !address) {
+                alert("Kripya saari delivery details bhariye!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Order Save ho raha hai...";
 
             try {
                 await db.collection("orders").add({
-                    customerName: name, customerPhone: phone, deliveryAddress: address,
-                    items: cart, totalAmount: total, status: "Pending", orderDate: firebase.firestore.FieldValue.serverTimestamp()
+                    customerName: name,
+                    customerPhone: phone,
+                    deliveryAddress: address,
+                    items: cart,
+                    totalAmount: total,
+                    status: "Pending",
+                    orderDate: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert("Order Placed Successfully!");
+                
+                alert("🎉 Mubarak ho! Aapka order mil gaya hai.");
                 localStorage.removeItem('ananya_cart');
                 window.location.href = "index.html";
-            } catch(e) { alert(e.message); document.getElementById('orderBtn').disabled = false; }
+            } catch(e) {
+                console.error("Error:", e);
+                alert("Kuch galti hui hai: " + e.message);
+                btn.disabled = false;
+                btn.innerText = "Confirm Order Now";
+            }
         }
     </script>
 </body>
