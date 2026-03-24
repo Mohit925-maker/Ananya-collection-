@@ -1,0 +1,136 @@
+<!<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ananya | Product Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .size-btn.active { background-color: #db2777; color: white; border-color: #db2777; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <nav class="bg-white shadow-sm p-4 border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="brand-font text-2xl text-pink-600 cursor-pointer" onclick="window.location.href='index.html'">ANANYA</h1>
+            <div onclick="window.location.href='cart.html'" class="cursor-pointer relative bg-pink-50 p-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 py-12">
+        <div class="flex flex-col md:flex-row gap-12 bg-white p-8 rounded-3xl shadow-xl">
+            
+            <div class="w-full md:w-1/2">
+                <img id="mainImg" src="" class="w-full h-[500px] object-cover rounded-2xl shadow-md">
+            </div>
+
+            <div class="w-full md:w-1/2 space-y-6">
+                <div>
+                    <h2 id="pTitle" class="brand-font text-4xl text-gray-900 mb-2">Loading...</h2>
+                    <p id="pCategory" class="text-pink-500 uppercase tracking-widest text-xs font-bold">Category</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <span id="displayPrice" class="text-3xl font-bold text-gray-900">₹0</span>
+                    <span id="discountTag" class="hidden bg-green-100 text-green-600 text-xs px-2 py-1 rounded">-3% Size Discount</span>
+                </div>
+
+                <hr class="border-gray-100">
+
+                <div>
+                    <h4 class="font-semibold mb-3 text-gray-700">Select Size:</h4>
+                    <div class="flex gap-4">
+                        <button onclick="updatePrice('XL', 0)" class="size-btn border-2 border-gray-200 px-6 py-2 rounded-xl hover:border-pink-500 transition active" id="btnXL">XL</button>
+                        <button onclick="updatePrice('L', 3)" class="size-btn border-2 border-gray-200 px-6 py-2 rounded-xl hover:border-pink-500 transition" id="btnL">L</button>
+                        <button onclick="updatePrice('M', 3)" class="size-btn border-2 border-gray-200 px-6 py-2 rounded-xl hover:border-pink-500 transition" id="btnM">M</button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-2">*L aur M size par 3% discount milega.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6">
+                    <button onclick="addToBag()" class="w-full bg-pink-50 text-pink-600 border-2 border-pink-600 py-4 rounded-xl font-bold hover:bg-pink-600 hover:text-white transition">
+                        Add to Bag
+                    </button>
+                    <button onclick="buyNow()" class="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg">
+                        Order Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL se data lena (Ye tab kaam karega jab aap product list se data bhejenge)
+        const urlParams = new URLSearchParams(window.location.search);
+        let basePrice = parseInt(urlParams.get('price')) || 1000;
+        let currentPrice = basePrice;
+        let selectedSize = 'XL';
+        let pName = urlParams.get('name') || "Designer Wear";
+        let pImg = urlParams.get('img') || "https://via.placeholder.com/500";
+
+        // Initial Page Load
+        document.getElementById('pTitle').innerText = pName;
+        document.getElementById('displayPrice').innerText = "₹" + basePrice;
+        document.getElementById('mainImg').src = pImg;
+        document.getElementById('pCategory').innerText = urlParams.get('cat') || "Collection";
+
+        function updatePrice(size, discountPercent) {
+            selectedSize = size;
+            
+            // Buttons UI Update
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + size).classList.add('active');
+
+            // Price Calculation
+            if(discountPercent > 0) {
+                // $3\%$ calculation: $$Price - (Price \times 0.03)$$
+                currentPrice = Math.floor(basePrice - (basePrice * (discountPercent / 100)));
+                document.getElementById('discountTag').classList.remove('hidden');
+            } else {
+                currentPrice = basePrice;
+                document.getElementById('discountTag').classList.add('hidden');
+            }
+
+            document.getElementById('displayPrice').innerText = "₹" + currentPrice;
+        }
+
+        function addToBag() {
+            let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
+            cart.push({
+                name: pName + " (" + selectedSize + ")",
+                price: currentPrice,
+                image: pImg
+            });
+            localStorage.setItem('ananya_cart', JSON.stringify(cart));
+            alert(pName + " Bag mein add ho gaya!");
+        }
+
+        function buyNow() {
+            // Seedha Checkout page par bhej dega (Cart mein daal kar)
+            addToBag();
+            window.location.href = "checkout.html";
+        }
+    </script>
+</body>
+</html>
+OCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+</head>
+<body>
+  <h1>
+    Hello, World!
+  </h1>
+</body>
+</html>

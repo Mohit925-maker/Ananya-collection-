@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ananya Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: 'sans-serif'; background: #fff5f7; }
+    </style>
+</head>
+<body class="p-4 pb-10">
+
+    <div class="max-w-md mx-auto space-y-6">
+        
+        <h1 class="text-center text-2xl font-bold text-pink-600 py-4">Checkout</h1>
+
+        <div class="bg-white p-6 rounded-3xl shadow-lg">
+            <h2 class="font-bold mb-4 border-b pb-2">Your Order</h2>
+            <div id="orderSummary" class="text-sm space-y-2 mb-4"></div>
+            <div class="flex justify-between font-bold text-pink-600 text-lg border-t pt-3">
+                <span>Total:</span> <span id="finalTotal">₹0</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-lg space-y-4">
+            <h2 class="font-bold mb-2 border-b pb-2">Delivery Details</h2>
+            <input type="text" id="custName" placeholder="Full Name" class="w-full p-4 bg-pink-50 rounded-xl outline-none">
+            <input type="tel" id="custPhone" placeholder="Phone Number" class="w-full p-4 bg-pink-50 rounded-xl outline-none">
+            <textarea id="custAddress" placeholder="Full Address with Pincode" class="w-full p-4 bg-pink-50 rounded-xl outline-none h-24"></textarea>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-lg text-center">
+            <h2 class="font-bold mb-4">Payment</h2>
+            <div class="border-4 border-dashed border-pink-100 p-2 inline-block rounded-2xl mb-4">
+                <img id="qrDisplayImg" src="https://i.ibb.co/LXX1DVdd/phonepe-1774254528875.png" class="w-48 h-48 mx-auto object-contain">
+            </div>
+            <p class="text-[10px] text-pink-500 font-bold italic">Scan & Pay to Confirm Order</p>
+        </div>
+
+        <button onclick="submitOrder()" id="orderBtn" class="w-full bg-pink-600 text-white py-5 rounded-2xl font-bold text-lg shadow-xl shadow-pink-200">Confirm Order</button>
+
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
+            authDomain: "mb-collection-16a7c.firebaseapp.com",
+            projectId: "mb-collection-16a7c",
+            storageBucket: "mb-collection-16a7c.firebasestorage.app",
+            messagingSenderId: "2884770751",
+            appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
+        let total = 0;
+        cart.forEach(item => {
+            total += parseInt(item.price);
+            document.getElementById('orderSummary').innerHTML += `<div class="flex justify-between"><span>${item.name}</span><b>₹${item.price}</b></div>`;
+        });
+        document.getElementById('finalTotal').innerText = "₹" + total;
+
+        // FETCH QR FROM FIREBASE (With Auto-Update)
+        db.collection("settings").doc("payment").onSnapshot(doc => {
+            if(doc.exists && doc.data().qrCode) {
+                document.getElementById('qrDisplayImg').src = doc.data().qrCode;
+            }
+        });
+
+        async function submitOrder() {
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
+            if(!name || !phone || !address) return alert("Details bhariye!");
+
+            document.getElementById('orderBtn').innerText = "Saving Order...";
+            document.getElementById('orderBtn').disabled = true;
+
+            try {
+                await db.collection("orders").add({
+                    customerName: name, customerPhone: phone, deliveryAddress: address,
+                    items: cart, totalAmount: total, status: "Pending", orderDate: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Order Placed Successfully!");
+                localStorage.removeItem('ananya_cart');
+                window.location.href = "index.html";
+            } catch(e) { alert(e.message); document.getElementById('orderBtn').disabled = false; }
+        }
+    </script>
+</body>
+</html>

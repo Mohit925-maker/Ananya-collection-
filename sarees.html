@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ananya | Saree Collection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-50">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="font-serif text-2xl text-pink-600 font-bold cursor-pointer" onclick="window.location.href='index.html'">ANANYA</h1>
+            <div onclick="window.location.href='cart.html'" class="relative cursor-pointer bg-pink-50 p-2 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cartCount" class="absolute -top-1 -right-1 bg-black text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="py-10 text-center">
+        <h2 class="font-serif text-4xl text-gray-900">Premium Sarees</h2>
+        <p class="text-gray-500 mt-2 italic text-sm">Click on any saree to see details & select size</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 pb-20">
+        <div id="sareeGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="col-span-full text-center py-20 text-gray-400">Loading collection...</div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
+            authDomain: "mb-collection-16a7c.firebaseapp.com",
+            projectId: "mb-collection-16a7c",
+            storageBucket: "mb-collection-16a7c.firebasestorage.app",
+            messagingSenderId: "2884770751",
+            appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Database se data lana
+        db.collection("products")
+          .where("category", "==", "Sarees")
+          .onSnapshot((snapshot) => {
+            const grid = document.getElementById('sareeGrid');
+            grid.innerHTML = "";
+
+            snapshot.forEach((doc) => {
+                const p = doc.data();
+                // Encode the data to pass in URL
+                const name = encodeURIComponent(p.name);
+                const img = encodeURIComponent(p.image);
+                const price = p.price;
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition overflow-hidden cursor-pointer group" 
+                         onclick="window.location.href='product-details.html?name=${name}&price=${price}&img=${img}&cat=Sarees'">
+                        <div class="h-80 overflow-hidden">
+                            <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        </div>
+                        <div class="p-4 text-center">
+                            <h3 class="font-semibold text-gray-800 truncate">${p.name}</h3>
+                            <p class="text-pink-600 font-bold mt-1">₹${p.price}</p>
+                            <p class="text-[10px] text-gray-400 mt-2 uppercase tracking-tighter">View Details & Sizes</p>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+
+        // Update Cart Count icon
+        function updateCount() {
+            let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+        updateCount();
+    </script>
+</body>
+</html>

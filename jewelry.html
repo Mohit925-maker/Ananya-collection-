@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ananya | Premium Jewelry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .gold-gradient {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-[#fafafa] text-gray-800">
+
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 p-4 border-b border-yellow-100">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="brand-font text-2xl text-pink-600 cursor-pointer font-bold" onclick="window.location.href='index.html'">ANANYA</h1>
+            <div class="flex items-center space-x-6 text-sm font-semibold tracking-widest uppercase">
+                <a href="index.html" class="hover:text-pink-600 transition">Home</a>
+                <a href="shop.html" class="hover:text-pink-600 transition">Shop All</a>
+                <div class="bg-yellow-50 p-2 rounded-full cursor-pointer hover:bg-yellow-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V9a2 2 0 00-2-2m2 4v4a2 2 0 104 0v-1m-4-3H9m2 0h4m6 1a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="py-16 text-center bg-white border-b border-yellow-50">
+        <h2 class="brand-font text-4xl md:text-5xl tracking-widest uppercase mb-2 gold-gradient">Sparkle & Shine</h2>
+        <p class="text-gray-400 font-light italic tracking-widest text-xs">Exquisite Jewelry for Every Occasion</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-16">
+        <div id="jewelryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div class="col-span-full text-center py-20 text-gray-300 tracking-widest uppercase text-xs">
+                Fine Jewelry loading...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Your Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
+            authDomain: "mb-collection-16a7c.firebaseapp.com",
+            projectId: "mb-collection-16a7c",
+            storageBucket: "mb-collection-16a7c.firebasestorage.app",
+            messagingSenderId: "2884770751",
+            appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const jewelryGrid = document.getElementById('jewelryGrid');
+
+        // Fetch "Jewelry" category only
+        db.collection("products")
+          .where("category", "==", "Jewelry") 
+          .onSnapshot((snapshot) => {
+            jewelryGrid.innerHTML = ""; 
+
+            if (snapshot.empty) {
+                jewelryGrid.innerHTML = `
+                    <div class="col-span-full text-center py-20 border border-yellow-100 rounded-3xl bg-white">
+                        <p class="text-gray-400 font-light italic">Currently no jewelry in stock. Stay tuned!</p>
+                    </div>`;
+                return;
+            }
+
+            snapshot.forEach((doc) => {
+                const product = doc.data();
+                jewelryGrid.innerHTML += `
+                    <div class="group relative bg-white p-4 rounded-[2rem] shadow-sm hover:shadow-2xl transition-all duration-700 overflow-hidden">
+                        <div class="relative overflow-hidden rounded-[1.5rem] bg-gray-50 h-[350px]">
+                            <img src="${product.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-1000">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition duration-700"></div>
+                        </div>
+                        <div class="mt-6 text-center space-y-2">
+                            <h3 class="text-gray-800 font-medium text-lg brand-font tracking-wide">${product.name}</h3>
+                            <div class="flex flex-col items-center">
+                                <span class="text-yellow-700 font-bold text-xl">₹${product.price}</span>
+                                <div class="h-[1px] w-8 bg-yellow-200 mt-2"></div>
+                            </div>
+                            <button class="w-full mt-4 border border-yellow-600 text-yellow-700 py-3 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-yellow-600 hover:text-white transition-all duration-500">
+                                Add to Collection
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
+
+    <footer class="bg-white py-12 border-t mt-20 text-center">
+        <p class="text-gray-400 text-[10px] tracking-[0.5em] uppercase italic">ANANYA FINE JEWELRY • EST. 2026</p>
+    </footer>
+
+</body>
+</html>
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+</head>
+<body>
+  <h1>
+    Hello, World!
+  </h1>
+</body>
+</html>
