@@ -1,120 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ananya | Unique Women's Fashion</title>
+    <title>Ananya Boutique - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .brand-font { font-family: 'Playfair Display', serif; }
-        .hero-bg {
-            background: linear-gradient(rgba(255,192,203,0.2), rgba(255,192,203,0.2)), 
-                        url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover; background-position: center;
-        }
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        @media (min-width: 768px) { .product-grid { grid-template-columns: repeat(4, 1fr); } }
     </style>
 </head>
 <body class="bg-gray-50">
 
-    <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-pink-100">
-        <div class="max-w-7xl mx-auto px-4 h-20 flex justify-between items-center">
-            <h1 class="brand-font text-3xl text-pink-600 font-bold cursor-pointer" onclick="location.reload()">ANANYA</h1>
-            
-            <div class="hidden md:flex space-x-8 text-xs font-bold tracking-widest uppercase">
-                <button onclick="window.location.href='shop.html'" class="hover:text-pink-600">Shop Collection</button>
-                <button onclick="window.location.href='sarees.html'" class="hover:text-pink-600">Sarees</button>
-                <button onclick="window.location.href='kurtis.html'" class="hover:text-pink-600">Kurtis</button>
-                <button onclick="window.location.href='jewelry.html'" class="hover:text-pink-600">Jewelry</button>
-            </div>
+    <header class="bg-white p-4 shadow-sm sticky top-0 z-10 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-pink-600">Ananya Hub</h1>
+        <a href="cart.html" class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span id="cartCount" class="absolute -top-2 -right-2 bg-pink-600 text-white text-[10px] rounded-full px-1.5 font-bold">0</span>
+        </a>
+    </header>
 
-            <button id="authBtn" class="bg-pink-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg hover:bg-pink-700 transition">
-                Checking...
-            </button>
+    <div class="p-4">
+        <div class="bg-pink-100 rounded-3xl p-6 text-pink-800">
+            <h2 class="text-2xl font-bold">New Arrivals</h2>
+            <p class="text-sm">Latest Collection is Live!</p>
         </div>
-    </nav>
+    </div>
 
-    <section class="hero-bg h-[400px] flex items-center justify-center text-center">
-        <div class="max-w-xl bg-white/60 backdrop-blur-md p-10 rounded-3xl shadow-2xl">
-            <h2 class="brand-font text-5xl mb-4 text-gray-900">Be Unique, Be You.</h2>
-            <p class="text-gray-600 mb-8 font-light italic">Har libaas mein ek nayi kahani.</p>
-            <button onclick="window.location.href='shop.html'" class="bg-black text-white px-10 py-4 rounded-lg uppercase tracking-widest text-xs font-bold hover:bg-gray-800">
-                Shop Collection
-            </button>
+    <div class="p-4">
+        <h3 class="font-bold text-lg mb-4 text-gray-800">Our Products</h3>
+        <div id="productsList" class="product-grid">
+            <p class="text-gray-400 col-span-2 text-center py-10">Loading Products...</p>
         </div>
-    </section>
-
-    <section class="max-w-7xl mx-auto px-4 py-16">
-        <h3 class="brand-font text-3xl text-center mb-12">Browse by Style</h3>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
-            <div onclick="window.location.href='sarees.html'" class="group cursor-pointer">
-                <div class="h-80 rounded-2xl overflow-hidden shadow-lg mb-4">
-                    <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                </div>
-                <h4 class="font-bold text-lg uppercase tracking-wider text-gray-800">Sarees</h4>
-                <p class="text-pink-500 text-sm italic">Shop Traditional</p>
-            </div>
-
-            <div onclick="window.location.href='kurtis.html'" class="group cursor-pointer">
-                <div class="h-80 rounded-2xl overflow-hidden shadow-lg mb-4">
-                    <img src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                </div>
-                <h4 class="font-bold text-lg uppercase tracking-wider text-gray-800">Kurtis</h4>
-                <p class="text-pink-500 text-sm italic">Shop Modern</p>
-            </div>
-
-            <div onclick="window.location.href='jewelry.html'" class="group cursor-pointer">
-                <div class="h-80 rounded-2xl overflow-hidden shadow-lg mb-4">
-                    <img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
-                </div>
-                <h4 class="font-bold text-lg uppercase tracking-wider text-gray-800">Jewelry</h4>
-                <p class="text-pink-500 text-sm italic">Shop Shine</p>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-white py-12 border-t text-center">
-        <h1 class="brand-font text-2xl text-pink-600 mb-4">ANANYA</h1>
-        <p class="text-gray-400 text-xs tracking-[0.3em] uppercase mb-8">Elegance in every thread</p>
-        <div class="flex justify-center space-x-6 text-gray-400">
-            <a href="#" class="hover:text-pink-600 transition">Instagram</a>
-            <a href="#" class="hover:text-pink-600 transition">WhatsApp</a>
-        </div>
-    </footer>
+    </div>
 
     <script>
+        // *** NAYA FIREBASE CONFIG ***
         const firebaseConfig = {
-            apiKey: "AIzaSyDJRYawH4SxjidRKUZjuRVAINe8i_Mf-E0",
-            authDomain: "mb-collection-16a7c.firebaseapp.com",
-            projectId: "mb-collection-16a7c",
-            storageBucket: "mb-collection-16a7c.firebasestorage.app",
-            messagingSenderId: "2884770751",
-            appId: "1:2884770751:web:ff5419e12f6912cb69df0a"
+            apiKey: "AIzaSyBOhnP6mG5mmFEhruPBL9s-yq_uSV_U4H4",
+            authDomain: "mb-collection-1846c.firebaseapp.com",
+            projectId: "mb-collection-1846c",
+            storageBucket: "mb-collection-1846c.firebasestorage.app",
+            messagingSenderId: "139202861306",
+            appId: "1:139202861306:web:b2a1f3bf48d6a7dc7a1143"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const authBtn = document.getElementById('authBtn');
+        const db = firebase.firestore();
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                authBtn.innerText = "Logout";
-                authBtn.onclick = () => {
-                    auth.signOut().then(() => location.reload());
-                };
-            } else {
-                authBtn.innerText = "Login / OTP";
-                authBtn.onclick = () => {
-                    window.location.href = "login.html";
-                };
+        // 1. LOAD PRODUCTS FROM FIREBASE
+        db.collection("products").orderBy("dateAdded", "desc").onSnapshot(snap => {
+            const list = document.getElementById('productsList');
+            list.innerHTML = "";
+            
+            if(snap.empty) {
+                list.innerHTML = "<p class='col-span-2 text-center text-gray-400'>Abhi koi products nahi hain.</p>";
+                return;
             }
+
+            snap.forEach(doc => {
+                const p = doc.data();
+                const pId = doc.id;
+                list.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 p-2">
+                        <img src="${p.image}" class="w-full h-40 object-cover rounded-xl mb-2" onerror="this.src='https://via.placeholder.com/150'">
+                        <div class="p-1">
+                            <h4 class="font-bold text-sm text-gray-800 truncate">${p.name}</h4>
+                            <p class="text-pink-600 font-bold text-sm">₹${p.price}</p>
+                            <button onclick="addToCart('${pId}', '${p.name}', ${p.price}, '${p.image}')" 
+                                    class="w-full mt-2 bg-black text-white py-2 rounded-lg text-xs font-bold">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
         });
+
+        // 2. ADD TO CART FUNCTION
+        function addToCart(id, name, price, img) {
+            let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
+            cart.push({id, name, price, img});
+            localStorage.setItem('ananya_cart', JSON.stringify(cart));
+            updateCartCount();
+            alert(name + " added to cart!");
+        }
+
+        // 3. CART COUNT UPDATE
+        function updateCartCount() {
+            let cart = JSON.parse(localStorage.getItem('ananya_cart')) || [];
+            document.getElementById('cartCount').innerText = cart.length;
+        }
+
+        // Initial count check
+        updateCartCount();
     </script>
 </body>
 </html>
